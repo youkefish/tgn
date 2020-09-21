@@ -52,6 +52,10 @@ parser.add_argument('--different_new_nodes', action='store_true',
                     help='Whether to use disjoint set of new nodes for train and val')
 parser.add_argument('--uniform', action='store_true',
                     help='take uniform sampling from temporal neighbors')
+#!!!!!!!!!  --manifold and --c
+parser.add_argument('--manifold', type=str, default="Euclidean", choices=[
+  "Euclidean", "Hyperboloid", "PoincareBall"], help='Type of manifold')
+parser.add_argument('--c', type=float, default=1.0, help='curvature vaule')
 
 
 try:
@@ -76,7 +80,9 @@ TIME_DIM = args.time_dim
 USE_MEMORY = args.use_memory
 MESSAGE_DIM = args.message_dim
 MEMORY_DIM = args.memory_dim
-
+C= args.c
+#!!!!!!!!MANIFOLD
+MANIFOLD = args.manifold
 Path("./saved_models/").mkdir(parents=True, exist_ok=True)
 Path("./saved_checkpoints/").mkdir(parents=True, exist_ok=True)
 MODEL_SAVE_PATH = f'./saved_models/{args.prefix}-{args.data}.pth'
@@ -145,7 +151,7 @@ for i in range(args.n_runs):
             message_function=args.message_function,
             aggregator_type=args.aggregator, n_neighbors=NUM_NEIGHBORS,
             mean_time_shift_src=mean_time_shift_src, std_time_shift_src=std_time_shift_src,
-            mean_time_shift_dst=mean_time_shift_dst, std_time_shift_dst=std_time_shift_dst)
+            mean_time_shift_dst=mean_time_shift_dst, std_time_shift_dst=std_time_shift_dst, manifold=MANIFOLD,c=C)
   criterion = torch.nn.BCELoss()
   optimizer = torch.optim.Adam(tgn.parameters(), lr=LEARNING_RATE)
   tgn = tgn.to(device)

@@ -19,7 +19,7 @@ class TGN(torch.nn.Module):
                memory_dimension=500, embedding_module_type="graph_attention",
                message_function="mlp",
                mean_time_shift_src=0, std_time_shift_src=1, mean_time_shift_dst=0,
-               std_time_shift_dst=1, n_neighbors=None, aggregator_type="last"):
+               std_time_shift_dst=1, n_neighbors=None, aggregator_type="last", manifold="Euclidean",c=1.0):
     super(TGN, self).__init__()
 
     self.n_layers = n_layers
@@ -44,6 +44,8 @@ class TGN(torch.nn.Module):
     self.std_time_shift_src = std_time_shift_src
     self.mean_time_shift_dst = mean_time_shift_dst
     self.std_time_shift_dst = std_time_shift_dst
+    self.manifold = manifold
+    self.c = c
 
     if self.use_memory:
       self.memory_dimension = memory_dimension
@@ -56,6 +58,7 @@ class TGN(torch.nn.Module):
                            input_dimension=message_dimension,
                            message_dimension=message_dimension,
                            device=device)
+      #!!!!!!!!!!!!!!!!!!!
       self.message_aggregator = get_message_aggregator(aggregator_type=aggregator_type,
                                                        device=device)
       self.message_function = get_message_function(module_type=message_function,
@@ -63,8 +66,8 @@ class TGN(torch.nn.Module):
                                                    message_dimension=message_dimension)
       self.memory_updater = GRUMemoryUpdater(memory=self.memory,
                                              message_dimension=message_dimension,
-                                             memory_dimension=self.memory_dimension, device=device)
-
+                                             memory_dimension=self.memory_dimension, device=device, manifold=self.manifold,c=self.c)
+      #!!!!!!!!!!
     self.embedding_module_type = embedding_module_type
 
     self.embedding_module = get_embedding_module(module_type=embedding_module_type,
