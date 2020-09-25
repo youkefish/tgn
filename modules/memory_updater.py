@@ -1,6 +1,6 @@
 from torch import nn
 import torch
-from modules.GRUCell_with_hyp_bias import, GRUCell_with_hyp_bias
+from modules.GRUCell_with_hyp_bias import GRUCell_with_hyp_bias
 
 
 class MemoryUpdater(nn.Module):
@@ -20,14 +20,15 @@ class GRUMemoryUpdater(MemoryUpdater):
     if self.manifold == "Euclidean":
         #original version
         self.memory_updater = nn.GRUCell(input_size=message_dimension,
-                                     hidden_size=memory_dimension)
+                                         hidden_size=memory_dimension)
     elif self.manifold == "Hyperboloid":
-        self.memory_updater = GRUCell_with_hyp_bias(manifold=manifold,c=c,
-                                                input_size=message_dimension,
-                                                hidden_size=memory_dimension)
-    '''
-    TODO!!!!!!!!: need to do Poincare part
-    '''
+        self.memory_updater = GRUCell_with_hyp_bias(manifold=manifold, c=c,
+                                                    input_size=message_dimension,
+                                                    hidden_size=memory_dimension)
+    elif self.manifold == "PoincareBall":
+        self.memory_updater = GRUCell_with_hyp_bias(manifold=manifold, c=c,
+                                                    input_size=message_dimension,
+                                                    hidden_size=memory_dimension)
 
 
   def update_memory(self, unique_node_ids, unique_messages, timestamps):

@@ -19,7 +19,7 @@ class RNNCellBase_with_hyp_bias(Module):
     # WARNING: bias_ih and bias_hh purposely not defined here.
     # See https://github.com/pytorch/pytorch/issues/39670
 
-    def __init__(self, manifold ,c ,input_size: int, hidden_size: int, bias: bool, num_chunks: int,manifold) -> None:
+    def __init__(self, manifold: str, c: float, input_size: int, hidden_size: int, bias: bool, num_chunks: int) -> None:
         super(RNNCellBase_with_hyp_bias, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -78,69 +78,11 @@ class RNNCellBase_with_hyp_bias(Module):
 
 
 class GRUCell_with_hyp_bias(RNNCellBase_with_hyp_bias):
-    r"""A gated recurrent unit (GRU) cell
-
-    .. math::
-
-        \begin{array}{ll}
-        r = \sigma(W_{ir} x + b_{ir} + W_{hr} h + b_{hr}) \\
-        z = \sigma(W_{iz} x + b_{iz} + W_{hz} h + b_{hz}) \\
-        n = \tanh(W_{in} x + b_{in} + r * (W_{hn} h + b_{hn})) \\
-        h' = (1 - z) * n + z * h
-        \end{array}
-
-    where :math:`\sigma` is the sigmoid function, and :math:`*` is the Hadamard product.
-
-    Args:
-        input_size: The number of expected features in the input `x`
-        hidden_size: The number of features in the hidden state `h`
-        bias: If ``False``, then the layer does not use bias weights `b_ih` and
-            `b_hh`. Default: ``True``
-
-    Inputs: input, hidden
-        - **input** of shape `(batch, input_size)`: tensor containing input features
-        - **hidden** of shape `(batch, hidden_size)`: tensor containing the initial hidden
-          state for each element in the batch.
-          Defaults to zero if not provided.
-
-    Outputs: h'
-        - **h'** of shape `(batch, hidden_size)`: tensor containing the next hidden state
-          for each element in the batch
-
-    Shape:
-        - Input1: :math:`(N, H_{in})` tensor containing input features where
-          :math:`H_{in}` = `input_size`
-        - Input2: :math:`(N, H_{out})` tensor containing the initial hidden
-          state for each element in the batch where :math:`H_{out}` = `hidden_size`
-          Defaults to zero if not provided.
-        - Output: :math:`(N, H_{out})` tensor containing the next hidden state
-          for each element in the batch
-
-    Attributes:
-        weight_ih: the learnable input-hidden weights, of shape
-            `(3*hidden_size, input_size)`
-        weight_hh: the learnable hidden-hidden weights, of shape
-            `(3*hidden_size, hidden_size)`
-        bias_ih: the learnable input-hidden bias, of shape `(3*hidden_size)`
-        bias_hh: the learnable hidden-hidden bias, of shape `(3*hidden_size)`
-
-    .. note::
-        All the weights and biases are initialized from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})`
-        where :math:`k = \frac{1}{\text{hidden\_size}}`
-
-    Examples::
-
-        >>> rnn = nn.GRUCell(10, 20)
-        >>> input = torch.randn(6, 3, 10)
-        >>> hx = torch.randn(3, 20)
-        >>> output = []
-        >>> for i in range(6):
-                hx = rnn(input[i], hx)
-                output.append(hx)
+    r"""A gated recurrent unit (GRU) cell with hyperbolic bias
     """
 
     def __init__(self, manifold,c, input_size: int, hidden_size: int, bias: bool = True) -> None:
-        super(GRUCell_with_hyp_bias, self).__init__(manifold,c,input_size, hidden_size, bias, num_chunks=3)
+        super(GRUCell_with_hyp_bias, self).__init__(manifold, c, input_size, hidden_size, bias, num_chunks=3)
 
     def forward(self, input: Tensor, hx: Optional[Tensor] = None) -> Tensor:
         self.check_forward_input(input)

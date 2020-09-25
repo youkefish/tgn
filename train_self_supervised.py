@@ -216,7 +216,7 @@ for i in range(args.n_runs):
 
       loss /= args.backprop_every
 
-      loss.backward()
+      loss.backward(retain_graph=True)
       optimizer.step()
       m_loss.append(loss.item())
 
